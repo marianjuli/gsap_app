@@ -23,8 +23,8 @@ export default function MacbookModel16(props) {
 
   const texture = useTexture("/screen.png");
 
-  texture.colorSpace = SRGBColorSpace;
-  texture.needsUpdate = true;
+  texture.colorSpace = SRGBColorSpace; // we use it as a color texture, so sRGB color space is correct and doesn't wash out the colors. If we were to use it as a data texture, we would use LinearSRGBColorSpace instead. See: https://threejs.org/docs/index.html?q=texture#api/en/textures/Texture.colorSpace
+  texture.needsUpdate = true; // flags that the texture needs to be re-uploaded to the GPU, this is necessary after changing the color space to ensure the change takes effect.
 
   useEffect(() => {
     scene.traverse((child) => {
@@ -125,7 +125,7 @@ export default function MacbookModel16(props) {
       />
       <mesh
         geometry={nodes.Object_123.geometry}
-        material={materials.sfCQkHOWyrsLmor}
+       
         rotation={[Math.PI / 2, 0, 0]}
       >
         <meshBasicMaterial map={texture} />
