@@ -10,9 +10,17 @@ Title: macbook pro M3 16 inch 2024
 
 
 import { useGLTF } from '@react-three/drei'
+import {useVideoTexture} from '@react-three/drei';
+import useMacbookStore from '../../store/index.js';
+
+
+
 
 export default function MacbookModel(props) {
-  const { nodes, materials } = useGLTF('/models/macbook-transformed.glb')
+  const {color, texture} = useMacbookStore();
+  const { nodes, materials, scene } = useGLTF('/models/macbook-transformed.glb')
+
+  const screen = useVideoTexture((texture))//the path is coming from the Zustand store, ponting to an mp4 file, which allows us to easily update the texture when we click on different features in the Features section. The useVideoTexture hook creates a texture from the video file, which can then be applied to the screen mesh in the 3D model.
 
 
   return (
