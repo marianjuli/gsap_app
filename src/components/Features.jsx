@@ -95,20 +95,20 @@ const ModelScroll = () => {
       >
         {" "}
         //the Suspense component is used to wrap the MacbookModel component,
-        which allows us to display a fallback UI (in this case, a simple
-        "Loading..." message) while the 3D model is being loaded. This is
-        important because loading 3D models can take some time, and we want to
-        provide feedback to the user that something is happening while they wait
-        for the model to appear.
+        //which allows us to display a fallback UI (in this case, a simple
+        //"Loading..." message) while the 3D model is being loaded. This is
+        //important because loading 3D models can take some time, and we want to
+        //provide feedback to the user that something is happening while they wait
+        //for the model to appear.
         <MacbookModel
           scale={isMobile ? 0.05 : 0.08}
           position={[0, -1, 0]}
         />{" "}
         //positioning the MacBook model slightly lower on the Y-axis to ensure
-        it is fully visible within the canvas, especially on smaller screens.
-        The scale is also adjusted based on whether the user is on a mobile
-        device or not, ensuring that the model looks good and fits well within
-        the viewport regardless of the device being used.
+        //it is fully visible within the canvas, especially on smaller screens.
+        //The scale is also adjusted based on whether the user is on a mobile
+        //device or not, ensuring that the model looks good and fits well within
+        //the viewport regardless of the device being used.
       </Suspense>
     </group>
   );
