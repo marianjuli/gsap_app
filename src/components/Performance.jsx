@@ -1,12 +1,47 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { performanceImages, performanceImgPositions } from "../constants/index.js";
-import {useMediaQuery} from "react-responsive";
 
 const Performance = () => {
-    const isMobile = useMediaQuery({ query: "(max-width: 1024px)" });
     const sectionRef = useRef(null); //we create a reference to the section element that we want to animate. This allows us to target the section for our GSAP animations and scroll triggers.
+
+    useEffect(() => {
+        let timeoutId;
+        const scheduleRefresh = () => {
+            clearTimeout(timeoutId);
+            timeoutId = window.setTimeout(() => {
+                ScrollTrigger.refresh();
+            }, 150);
+        };
+
+        // Primera pintura: sin esto, en móvil los triggers a veces se crean antes de que
+        // el layout/imágenes estén estables; al redimensionar en DevTools ya se refrescaba.
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                ScrollTrigger.refresh();
+            });
+        });
+
+        if (document.readyState === "complete") {
+            scheduleRefresh();
+        } else {
+            window.addEventListener("load", scheduleRefresh, { once: true });
+        }
+
+        document.fonts?.ready?.then(() => ScrollTrigger.refresh());
+
+        window.addEventListener("resize", scheduleRefresh);
+        window.addEventListener("orientationchange", scheduleRefresh);
+
+        return () => {
+            clearTimeout(timeoutId);
+            window.removeEventListener("load", scheduleRefresh);
+            window.removeEventListener("resize", scheduleRefresh);
+            window.removeEventListener("orientationchange", scheduleRefresh);
+        };
+    }, []);
 
     useGSAP(
         () => {
@@ -31,9 +66,7 @@ const Performance = () => {
                 }
             );
 
-            if (isMobile) return;
-
-            // Image Positioning Timeline
+            // Image Positioning Timeline (runs on all viewports; was previously skipped on mobile via early return)
             const tl = gsap.timeline({
                 defaults: { duration: 2, ease: "power1.inOut", overwrite: "auto" }, //we set default properties for all animations in the timeline, including a duration of 2 seconds, an easing function for smooth transitions, and overwrite set to "auto" to prevent conflicts between animations
                 scrollTrigger: {
@@ -41,7 +74,7 @@ const Performance = () => {
                     start: "top bottom",//the timeline starts when the top of the section hits the bottom of the viewport
                     end: "bottom top",//the timeline ends when the bottom of the section hits the top of the viewport
                     scrub: 1,   //the timeline is linked to the scroll position with a delay of 1 second, allowing for smooth and responsive animations as the user scrolls through the section
-                    invalidateOnRefresh: true,
+                    invalidateOnRefresh: true, // this ensures that the timeline is recalculated if the viewport size changes, which is important for responsive design and ensures that the animations remain accurate and visually appealing across different screen sizes.
                 },
             });
 
@@ -61,7 +94,7 @@ const Performance = () => {
                 tl.to(selector, vars, 0);
             });
         },
-        { scope: sectionRef, dependencies: [isMobile] }
+        { scope: sectionRef }
     );
 
     return (
